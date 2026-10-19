@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Porch: hangout messaging</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#15121c;--s1:#211c2d;--s2:#2d2640;--ln:rgba(255,255,255,.12);--tx:#f4f0fa;--mu:#a79fb8;--ac:#ff7a90;--on:#2a0a12;--ok:#62e0b0;--okx:#06251a;--pg:#0d0b12;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="light"]{--bg:#f6f2fa;--s1:#fff;--s2:#eee8f5;--ln:rgba(30,20,50,.12);--tx:#1d1729;--mu:#675e7c;--ac:#d12f4d;--on:#fff;--ok:#11885f;--okx:#fff;--pg:#e4deec;color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{background:var(--pg);font-family:'Bricolage Grotesque',system-ui,sans-serif;color:var(--tx);display:flex;align-items:center;justify-content:center}
+.phone{position:relative;width:390px;height:min(820px,calc(100% - 24px));background:var(--bg);border-radius:34px;border:1px solid var(--ln);overflow:hidden;display:flex;flex-direction:column}
+@media(max-width:480px){.phone{width:100%;height:100%;border-radius:0;border:0}}
+#app{flex:1;display:flex;flex-direction:column;min-height:0}
+.scr{flex:1;min-height:0;display:flex;flex-direction:column}
+.body{flex:1;overflow-y:auto;padding:0 18px 90px}
+.body.s{padding-bottom:18px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+h1{font-size:28px;margin:0;font-weight:700;letter-spacing:-.02em}
+p{margin:6px 0 0}.mu{color:var(--mu)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:14px;background:var(--ac);color:var(--on);font-weight:700;width:100%;font-size:16px}
+.btn.g{background:var(--s2);color:var(--tx)}.btn.dn{background:transparent;color:var(--ac);border:1px solid var(--ac)}.btn:disabled{opacity:.6;cursor:default}
+.top{display:flex;align-items:center;gap:10px;padding:16px 18px 12px}
+.ib{width:40px;height:40px;border-radius:12px;background:var(--s1);display:grid;place-items:center;border:1px solid var(--ln);flex:none}
+.card{background:var(--s1);border:1px solid var(--ln);border-radius:16px}
+.row{display:flex;align-items:center;gap:12px;padding:12px;width:100%;margin-bottom:10px;box-sizing:border-box}
+.em{width:46px;height:46px;border-radius:14px;background:var(--s2);display:grid;place-items:center;font-size:24px;flex:none}
+.av{display:grid;place-items:center;border-radius:50%;color:#1a1020;font-weight:700;flex:none}
+.stack{display:flex}.stack .av{border:3px solid var(--bg);margin-left:-12px}.stack .av:first-child{margin-left:0}
+.tag{font-size:12px;color:var(--mu);display:flex;align-items:center;gap:5px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block}
+@media(prefers-reduced-motion:no-preference){.dot{animation:pl 1.8s ease-in-out infinite}@keyframes pl{50%{opacity:.35}}.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(40px);opacity:0}}}
+.pill{height:36px;padding:0 14px;border-radius:18px;background:var(--s1);border:1px solid var(--ln);color:var(--mu);font-weight:700}
+.pill.on{background:var(--ok);color:var(--okx);border-color:transparent}
+.strip{display:flex;gap:14px;overflow-x:auto;padding:4px 0}
+.fa{display:grid;gap:6px;justify-items:center;font-size:13px;color:var(--mu)}
+.in{width:100%;height:48px;border-radius:12px;background:var(--s1);border:1px solid var(--ln);color:var(--tx);padding:0 14px;font:inherit;font-size:16px;box-sizing:border-box}
+.in.bad{border-color:var(--ac)}.er{color:var(--ac);font-size:13px;margin-top:6px}
+.lb{display:block;font-size:14px;color:var(--mu);margin:16px 0 6px}
+.fw{position:relative}.sh{position:absolute;right:6px;top:4px;width:40px;height:40px;display:grid;place-items:center;color:var(--mu)}
+.lnk{color:var(--ac);font-weight:700;text-decoration:underline}
+.sp{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.fab{position:absolute;right:18px;bottom:78px;height:48px;padding:0 18px;border-radius:24px;background:var(--ac);color:var(--on);font-weight:700;display:flex;align-items:center;gap:8px;z-index:2}
+.tabs{display:flex;border-top:1px solid var(--ln);background:var(--s1)}
+.tabs button{flex:1;padding:10px 0 12px;color:var(--mu);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabs .on{color:var(--ac);font-weight:700}
+.seg{display:flex;background:var(--s1);border:1px solid var(--ln);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;height:36px;border-radius:9px;color:var(--mu)}
+.seg [aria-pressed=true]{background:var(--ac);color:var(--on);font-weight:700}
+.eg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.eb{height:48px;font-size:22px;border-radius:12px;background:var(--s1);border:1px solid var(--ln)}.eb[aria-pressed=true]{border-color:var(--ac);background:var(--s2)}
+.row2{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;margin-top:16px;background:var(--s1);border:1px solid var(--ln);border-radius:14px}
+.tg{width:46px;height:28px;border-radius:14px;background:var(--s2);position:relative;border:1px solid var(--ln);flex:none}
+.tg::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--mu);transition:transform .2s}
+.tg[aria-checked=true]{background:var(--ac);border-color:transparent}.tg[aria-checked=true]::after{transform:translateX(18px);background:var(--on)}
+.empty{text-align:center;padding:24px 10px;color:var(--mu);display:grid;gap:12px}
+.b{display:block;max-width:80%;padding:10px 14px;border-radius:18px;background:var(--s1);border:1px solid var(--ln);text-align:left;margin-bottom:10px;position:relative;font-size:15px}
+.b.me{margin-left:auto;background:var(--ac);color:var(--on);border-color:transparent}
+.who{font-size:12px;color:var(--mu);margin:0 0 3px 6px}
+.rx{position:absolute;right:-4px;bottom:-12px;font-size:12px;background:var(--s2);border-radius:10px;padding:1px 5px;border:1px solid var(--ln)}
+.comp{display:flex;gap:8px;padding:10px 14px 14px;border-top:1px solid var(--ln);align-items:center}
+.send{width:44px;height:44px;border-radius:50%;background:var(--ac);color:var(--on);display:grid;place-items:center;flex:none}
+.ov{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;z-index:5}
+.sheet{width:100%;background:var(--s1);border-radius:24px 24px 0 0;padding:20px 18px 22px;display:grid;gap:10px;box-sizing:border-box}
+#toast{position:absolute;left:18px;right:18px;bottom:92px;background:var(--tx);color:var(--bg);border-radius:12px;padding:12px 14px;font-size:14px;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="phone"><div id="app"></div><div id="toast" role="status" aria-live="polite"></div></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const I=(p,w=20)=>`<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${p}"/></svg>`;
+const P={back:'M15 18l-6-6 6-6',send:'M22 2L11 13M22 2l-7 20-4-9-9-4z',plus:'M12 5v14M5 12h14',more:'M5 12h.01M12 12h.01M19 12h.01',chat:'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',fr:'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',me:'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',eye:'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'};
+const COL=['#ff7a90','#7aa7ff','#62e0b0','#ffc46b','#b68cff'];
+const av=(n,z=40)=>`<span class="av" style="width:${z}px;height:${z}px;background:${COL[[...n].reduce((a,c)=>a+c.charCodeAt(0),0)%5]};font-size:${Math.round(z*.42)}px">${esc(n[0].toUpperCase())}</span>`;
+const S={scr:'welcome',mode:'signup',user:null,q:'',fl:'all',room:null,modal:null,form:{},err:{},busy:false,pw:false,typ:null,free:true,status:'Up for anything',pick:'🌙',exp:'3h',priv:false,
+set:{notif:true,sound:true,dark:matchMedia('(prefers-color-scheme: dark)').matches},
+rooms:[{id:1,name:'Late night snacks',e:'🍜',mem:['Aisha','Ravi','Mei'],exp:'3h',msgs:[{w:'Aisha',t:'Who’s still up? I’m making noodles'},{w:'Ravi',t:'Always. What kind?'}]},
+{id:2,name:'Study corner',e:'📚',mem:['Mei','Daniel'],exp:'24h',msgs:[{w:'Mei',t:'Starting a 25 minute focus block'}]},
+{id:3,name:'Game night',e:'🎮',mem:['Ravi','Aisha','Daniel','Sofia'],exp:'Never',msgs:[]}],
+fr:[{n:'Aisha',free:true,s:'Making noodles'},{n:'Ravi',free:true,s:'Bored, send help'},{n:'Mei',free:false,s:'In a lecture'},{n:'Daniel',free:true,s:'Up for anything'},{n:'Sofia',free:false,s:'Back at 8pm'}]};
+const cur=()=>S.rooms.find(r=>r.id===S.room);
+let T;const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(T);T=setTimeout(()=>t.classList.remove('show'),2300)};
+const fld=(id,l,t,v,er,pw)=>`<label class="lb" for="${id}">${l}</label><div class="fw"><input class="in${er?' bad':''}" id="${id}" type="${pw&&S.pw?'text':t}" value="${esc(v||'')}" data-enter="${S.scr==='create'?'create':'submit'}" autocomplete="off" ${er?`aria-invalid="true" aria-describedby="${id}e"`:''}>${pw?`<button class="sh" data-a="pw" aria-label="${S.pw?'Hide':'Show'} password">${I(P.eye)}</button>`:''}</div>${er?`<div class="er" id="${id}e" role="alert">${er}</div>`:''}`;
+const tabs=()=>`<nav class="tabs">${[['home','Hangouts','chat'],['friends','Friends','fr'],['me','Me','me']].map(([k,l,i])=>`<button class="${S.scr===k?'on':''}" data-a="tab" data-v="${k}" ${S.scr===k?'aria-current="page"':''}>${I(P[i],22)}${l}</button>`).join('')}</nav>`;
+const sw=(a,on,l)=>`<button class="tg" role="switch" aria-checked="${on}" aria-label="${l}" data-a="${a}" data-v="${a}"></button>`;
+const list=()=>{const q=S.q.trim().toLowerCase(),rs=S.rooms.filter(r=>r.name.toLowerCase().includes(q));return rs.length?rs.map(r=>`<button class="card row" data-a="open" data-v="${r.id}"><span class="em">${r.e}</span><span style="flex:1;text-align:left;min-width:0"><b>${esc(r.name)}</b><br><span class="mu" style="font-size:13px">${r.mem.length?esc(r.mem.slice(0,3).join(', ')):'Just you'}</span></span><span class="tag">${r.mem.length?`<i class="dot"></i>${r.mem.length} here`:'Empty'}</span></button>`).join(''):`<div class="empty"><span>No rooms match “${esc(S.q)}”.</span><button class="btn g" data-a="newRoom" data-v="q">Start this room</button></div>`};
+const msgs=r=>{const bub=(m,i)=>`<button class="b${m.w==='You'?' me':''}" data-a="react" data-v="${i}" aria-label="Message, tap to react">${esc(m.t)}${m.r?'<span class="rx">❤️</span>':''}</button>`;
+return (r.msgs.length?r.msgs.map((m,i)=>(m.w==='You'?'':`<div class="who">${esc(m.w)}</div>`)+bub(m,i)).join(''):`<div class="empty"><span>It’s quiet in here. Say hi, or invite someone.</span><button class="btn g" data-a="menu">Invite a friend</button></div>`)+(S.typ&&S.room===r.id?`<div class="who">${esc(S.typ)} is typing…</div>`:'')};
+const V={
+welcome:()=>`<div class="scr"><div class="body s" style="display:flex;flex-direction:column;justify-content:center;gap:24px"><div class="stack">${['Aisha','Ravi','Mei','Daniel'].map(n=>av(n,58)).join('')}</div><div><h1 style="font-size:46px;line-height:1">porch</h1><p class="mu" style="font-size:18px;margin-top:12px">A place to hang out, not another inbox. Drop into a room, say something, leave when you want.</p></div></div><div style="padding:0 18px 22px;display:grid;gap:10px"><button class="btn" data-a="auth" data-v="signup">Create account</button><button class="btn g" data-a="auth" data-v="login">I already have an account</button></div></div>`,
+auth:()=>{const su=S.mode==='signup',f=S.form,e=S.err;return `<div class="scr"><div class="top"><button class="ib" aria-label="Back" data-a="back">${I(P.back)}</button></div><div class="body s"><h1>${su?'Create your account':'Welcome back'}</h1><p class="mu">${su?'It takes under a minute.':'Log in to see who’s around.'}</p>${su?fld('name','Your name','text',f.name,e.name):''}${fld('email','Email','email',f.email,e.email)}${fld('pw','Password','password',f.pw,e.pw,true)}<button class="btn" style="margin-top:20px" data-a="submit" ${S.busy?'disabled':''}>${S.busy?'<span class="sp"></span>Please wait':(su?'Create account':'Log in')}</button><p class="mu" style="text-align:center;margin-top:16px">${su?'Already have an account?':'New here?'} <button class="lnk" data-a="mode">${su?'Log in':'Create account'}</button></p></div></div>`},
+home:()=>{const fr=S.fr.filter(x=>x.free);return `<div class="scr"><div class="top"><div style="flex:1;min-width:0"><h1>Hey, ${esc(S.user.name)}</h1><div class="mu" style="font-size:14px">${fr.length} friends are free now</div></div><button class="pill ${S.free?'on':''}" role="switch" aria-checked="${S.free}" data-a="free">${S.free?'I’m free':'Busy'}</button></div><div class="body"><div class="strip">${fr.map(x=>`<button class="fa" data-a="hang" data-v="${x.n}" aria-label="Hang out with ${x.n}">${av(x.n,52)}<span>${x.n}</span></button>`).join('')||'<span class="mu">Nobody’s free right now.</span>'}</div><input class="in" id="q" placeholder="Search rooms" value="${esc(S.q)}" aria-label="Search rooms" style="margin:14px 0"><div id="list">${list()}</div></div><button class="fab" data-a="newRoom">${I(P.plus)}New room</button>${tabs()}</div>`},
+friends:()=>{const l=S.fr.filter(x=>S.fl==='all'||x.free);return `<div class="scr"><div class="top"><h1 style="flex:1">Friends</h1><button class="ib" aria-label="Add friend" data-a="addfOpen">${I(P.plus)}</button></div><div class="body"><div class="seg">${[['all','Everyone'],['free','Free now']].map(([v,t])=>`<button aria-pressed="${S.fl===v}" data-a="fl" data-v="${v}">${t}</button>`).join('')}</div><div style="margin-top:14px">${l.length?l.map(x=>`<div class="card row">${av(x.n,44)}<span style="flex:1;min-width:0"><b>${esc(x.n)}</b><br><span class="mu" style="font-size:13px">${esc(x.s)}</span></span><button class="pill ${x.free?'on':''}" data-a="hang" data-v="${x.n}">${x.free?'Hang out':'Nudge'}</button></div>`).join(''):'<div class="empty"><span>Nobody is free right now.</span><button class="btn g" data-a="fl" data-v="all">Show everyone</button></div>'}</div></div>${tabs()}</div>`},
+me:()=>`<div class="scr"><div class="top"><h1>Me</h1></div><div class="body"><div style="display:flex;align-items:center;gap:14px">${av(S.user.name,64)}<div><b style="font-size:20px">${esc(S.user.name)}</b><div class="mu">${esc(S.status)}</div></div></div>${fld('st','Status','text',S.form.st??S.status,S.err.st).replace('data-enter="submit"','data-enter="saveSt"')}<button class="btn g" style="margin-top:12px" data-a="saveSt">Save status</button><div class="row2"><b>Notifications</b>${sw('notif',S.set.notif,'Notifications')}</div><div class="row2" style="margin-top:10px"><b>Sounds</b>${sw('sound',S.set.sound,'Sounds')}</div><div class="row2" style="margin-top:10px"><b>Dark mode</b>${sw('dark',S.set.dark,'Dark mode')}</div><button class="btn dn" style="margin-top:20px" data-a="logoutAsk">Log out</button></div>${tabs()}</div>`,
+create:()=>`<div class="scr"><div class="top"><button class="ib" aria-label="Back" data-a="back">${I(P.back)}</button><h1 style="font-size:22px">New room</h1></div><div class="body s">${fld('rn','Room name','text',S.form.rn,S.err.rn)}<label class="lb">Pick a symbol</label><div class="eg">${['🌙','🎮','📚','🍜','🎧','⚽','🎨','☕'].map(e=>`<button class="eb" aria-pressed="${S.pick===e}" data-a="pickE" data-v="${e}" aria-label="Symbol ${e}">${e}</button>`).join('')}</div><label class="lb">Room closes after</label><div class="seg">${['1h','3h','24h','Never'].map(v=>`<button aria-pressed="${S.exp===v}" data-a="exp" data-v="${v}">${v}</button>`).join('')}</div><div class="row2"><div><b>Invite only</b><div class="mu" style="font-size:13px">Only people with the link can join</div></div>${sw('priv',S.priv,'Invite only')}</div><button class="btn" style="margin-top:20px" data-a="create">Create room</button></div></div>`,
+room:()=>{const r=cur();return `<div class="scr"><div class="top"><button class="ib" aria-label="Back" data-a="back">${I(P.back)}</button><div style="flex:1;min-width:0"><b>${r.e} ${esc(r.name)}</b><div class="mu" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.mem.length?esc(r.mem.join(', ')):'Just you'}</div><div class="tag">${r.exp==='Never'?'Stays open':'Closes after '+r.exp}${r.mute?', muted':''}</div></div><button class="ib" aria-label="Room options" data-a="menu">${I(P.more)}</button></div><div class="body s" id="msgs">${msgs(r)}</div><div class="comp"><button class="ib" aria-label="Insert laughing emoji" data-a="emo" data-v="😂">😂</button><input class="in" id="m" placeholder="Say something" data-enter="send" aria-label="Message" autocomplete="off"><button class="send" aria-label="Send" data-a="send">${I(P.send)}</button></div></div>`}};
+const modal=()=>{const m=S.modal,c={
+menu:()=>{const r=cur();return `<b style="font-size:18px">${r.e} ${esc(r.name)}</b><button class="btn g" data-a="copy">Copy invite link</button><div class="row2" style="margin:0"><b>Mute room</b>${sw('mute',!!r.mute,'Mute room')}</div><button class="btn dn" data-a="leaveAsk">Leave room</button><button class="btn g" data-a="close">Close</button>`},
+leave:()=>`<b style="font-size:18px">Leave this room?</b><span class="mu">You can rejoin later with an invite link.</span><button class="btn dn" data-a="leaveYes">Leave room</button><button class="btn g" data-a="close">Stay</button>`,
+logout:()=>`<b style="font-size:18px">Log out of Porch?</b><button class="btn dn" data-a="logoutYes">Log out</button><button class="btn g" data-a="close">Cancel</button>`,
+addf:()=>`<b style="font-size:18px">Add a friend</b>${fld('fn','Their name','text',S.form.fn,S.err.fn).replace('data-enter="submit"','data-enter="addf"')}<button class="btn" data-a="addf">Add friend</button><button class="btn g" data-a="close">Cancel</button>`}[m]();
+return `<div class="ov" id="ov" data-a="close"><div class="sheet" role="dialog" aria-modal="true">${c}</div></div>`};
+function setModal(t){S.modal=t;const o=$('#ov');if(o)o.remove();if(t){$('#app').insertAdjacentHTML('beforeend',modal());const f=$('#fn');if(f)f.focus()}}
+function render(){document.documentElement.dataset.theme=S.set.dark?'dark':'light';$('#app').innerHTML=V[S.scr]()+(S.modal?modal():'');const m=$('#msgs');if(m)m.scrollTop=m.scrollHeight}
+function upd(){const m=$('#msgs');if(!m)return;m.innerHTML=msgs(cur());m.scrollTop=m.scrollHeight}
+function keep(){['name','email','pw','rn','st','fn'].forEach(i=>{const e=$('#'+i);if(e)S.form[i]=e.value})}
+const REP=['Haha yes','Wait, say more','I’m in','Give me five minutes','That’s the best idea today','Same here'];
+function reply(r){if(!r.mem.length)return;S.typ=r.mem[Math.floor(Math.random()*r.mem.length)];upd();setTimeout(()=>{const w=S.typ;S.typ=null;r.msgs.push({w,t:REP[Math.floor(Math.random()*REP.length)]});if(S.scr==='room'&&S.room===r.id)upd();else if(S.set.notif&&!r.mute)toast(w+' wrote in '+r.name)},1300)}
+const A={
+auth(v){S.mode=v;S.scr='auth';S.err={};S.form={};render()},
+mode(){S.mode=S.mode==='signup'?'login':'signup';S.err={};render()},
+back(){S.scr=S.scr==='auth'?'welcome':'home';S.room=null;S.err={};render()},
+pw(){S.pw=!S.pw;render()},
+submit(){const f=S.form,e={},su=S.mode==='signup';
+if(su&&!(f.name||'').trim())e.name='Enter your name.';
+if(!/^\S+@\S+\.\S+$/.test((f.email||'').trim()))e.email='Enter a valid email, like you@example.com.';
+if((f.pw||'').length<6)e.pw='Use at least 6 characters.';
+S.err=e;if(Object.keys(e).length){render();return}
+S.busy=true;render();
+setTimeout(()=>{S.busy=false;const n=su?f.name.trim():f.email.split('@')[0];S.user={name:n[0].toUpperCase()+n.slice(1)};S.scr='home';S.form={};S.err={};render();toast('You’re in. Say hi to someone.')},700)},
+tab(v){S.scr=v;S.err={};render()},
+free(){S.free=!S.free;render();toast(S.free?'Friends can see you’re free.':'You’re set to busy.')},
+open(v){S.room=+v;cur().joined=true;S.scr='room';render()},
+newRoom(v){S.form=v==='q'?{rn:S.q.trim()}:{};S.err={};S.pick='🌙';S.exp='3h';S.priv=false;S.scr='create';render()},
+pickE(v){S.pick=v;render()},exp(v){S.exp=v;render()},priv(){S.priv=!S.priv;render()},
+create(){const n=(S.form.rn||'').trim();if(n.length<2){S.err={rn:'Give your room a name (2+ characters).'};render();return}
+const r={id:Date.now(),name:n,e:S.pick,mem:[],exp:S.exp,priv:S.priv,msgs:[]};S.rooms.unshift(r);S.room=r.id;S.scr='room';S.err={};render();toast('“'+n+'” is open.')},
+send(){const i=$('#m'),t=i.value.trim();if(!t){i.focus();return}const r=cur();r.msgs.push({w:'You',t});i.value='';upd();reply(r)},
+emo(v){const i=$('#m');i.value+=v;i.focus()},
+react(v){const m=cur().msgs[+v];m.r=!m.r;upd()},
+menu(){setModal('menu')},close(){setModal(null)},
+mute(){const r=cur();r.mute=!r.mute;setModal('menu');toast(r.mute?'Room muted.':'Room unmuted.');const t=$('.top .tag');if(t)t.textContent=(r.exp==='Never'?'Stays open':'Closes after '+r.exp)+(r.mute?', muted':'')},
+copy(){const l='porch.app/r/'+cur().id.toString(36);setModal(null);try{navigator.clipboard.writeText(l).then(()=>toast('Invite link copied.'),()=>toast('Copy blocked. Link: '+l))}catch(_){toast('Link: '+l)}},
+leaveAsk(){setModal('leave')},
+leaveYes(){S.rooms=S.rooms.filter(r=>r.id!==S.room);S.room=null;S.scr='home';S.modal=null;render();toast('You left the room.')},
+fl(v){S.fl=v;render()},
+hang(v){const f=S.fr.find(x=>x.n===v);if(!f.free){toast(v+' is busy. Nudge sent.');return}
+let r=S.rooms.find(x=>x.name===v+' & you');if(!r){r={id:Date.now(),name:v+' & you',e:'👋',mem:[v],exp:'Never',msgs:[]};S.rooms.unshift(r)}A.open(r.id)},
+addfOpen(){S.form.fn='';S.err={};setModal('addf')},
+addf(){const n=($('#fn').value||'').trim();S.form.fn=n;let m='';
+if(!/^[A-Za-z]{2,15}$/.test(n))m='Use 2 to 15 letters, no spaces.';else if(S.fr.some(x=>x.n.toLowerCase()===n.toLowerCase()))m=n+' is already your friend.';
+if(m){S.err={fn:m};setModal('addf');return}
+const N=n[0].toUpperCase()+n.slice(1).toLowerCase();S.fr.push({n:N,free:false,s:'Just joined'});S.fl='all';S.modal=null;S.form.fn='';S.err={};render();toast(N+' added.')},
+saveSt(){const t=($('#st').value||'').trim();if(!t){S.err={st:'Write a short status first.'};render();return}S.status=t;S.form.st=t;S.err={};render();toast('Status saved.')},
+notif(){S.set.notif=!S.set.notif;render();toast(S.set.notif?'Notifications on.':'Notifications off.')},
+sound(){S.set.sound=!S.set.sound;render();toast(S.set.sound?'Sounds on.':'Sounds off.')},
+dark(){S.set.dark=!S.set.dark;render()},
+logoutAsk(){setModal('logout')},
+logoutYes(){S.user=null;S.scr='welcome';S.modal=null;S.free=true;S.form={};render()}};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;if(b.dataset.a==='close'&&e.target!==b)return;keep();const f=A[b.dataset.a];if(f)f(b.dataset.v)});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.enter){e.preventDefault();keep();A[e.target.dataset.enter]()}if(e.key==='Escape'&&S.modal)setModal(null)});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;$('#list').innerHTML=list()}});
+render();
+</script>
+</body>
+</html>
